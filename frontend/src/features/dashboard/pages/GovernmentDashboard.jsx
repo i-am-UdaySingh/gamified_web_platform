@@ -44,11 +44,50 @@ const Icons = {
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
     </svg>
+  ),
+  LogOut: () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>
+    </svg>
+  ),
+  Download: () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/>
+    </svg>
   )
 };
 
 /**
- * STYLES (Injected directly to fix "Plain Text" issue)
+ * MOCK DATA (INDIAN CONTEXT)
+ * ------------------------------------------------------------------
+ */
+
+const SCHOOLS_DATA = [
+  { id: 1, name: "The Doon School", region: "Dehradun, UK", students: 520, ecoScore: 92, status: "Gold" },
+  { id: 2, name: "Woodstock School", region: "Mussoorie, UK", students: 450, ecoScore: 88, status: "Silver" },
+  { id: 3, name: "Delhi Public School", region: "R.K. Puram, Delhi", students: 2500, ecoScore: 85, status: "Silver" },
+  { id: 4, name: "Kendriya Vidyalaya IIT", region: "Powai, Mumbai", students: 1200, ecoScore: 79, status: "Bronze" },
+  { id: 5, name: "Mayo College", region: "Ajmer, Rajasthan", students: 750, ecoScore: 95, status: "Gold" },
+  { id: 6, name: "St. Stephen's School", region: "Chandigarh", students: 1800, ecoScore: 72, status: "Bronze" },
+];
+
+const NGO_DATA = [
+  { id: 1, name: "Chintan Environmental", focus: "Waste Management", impact: "High", region: "North India" },
+  { id: 2, name: "Green Yatra", focus: "Tree Plantation", impact: "Very High", region: "Pan India" },
+  { id: 3, name: "Vatavaran", focus: "Water Conservation", impact: "Medium", region: "Bangalore" },
+  { id: 4, name: "SankalpTaru", focus: "Reforestation", impact: "High", region: "Himalayas" },
+  { id: 5, name: "Swechha", focus: "Youth Education", impact: "Medium", region: "Delhi NCR" },
+];
+
+const REPORTS_DATA = [
+  { id: 1, title: "Q3 2024 Environmental Impact Assessment", type: "PDF", size: "2.4 MB" },
+  { id: 2, title: "Student Engagement Analysis - North Zone", type: "PDF", size: "1.8 MB" },
+  { id: 3, title: "NGO Fund Utilization Report 2024", type: "PDF", size: "3.1 MB" },
+  { id: 4, title: "Policy Recommendation: Urban Greening", type: "PDF", size: "5.2 MB" },
+];
+
+/**
+ * STYLES (Injected directly)
  * ------------------------------------------------------------------
  */
 const styles = `
@@ -56,13 +95,14 @@ const styles = `
   .eq-sidebar { width: 260px; background: white; border-right: 1px solid #e2e8f0; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; }
   .eq-logo-area { padding: 24px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 20px; color: #064e3b; }
   .eq-logo-icon { width: 32px; height: 32px; background: #d1fae5; color: #059669; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
-  .eq-nav { padding: 16px; flex: 1; }
+  .eq-nav { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
   .eq-nav-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 8px; cursor: pointer; color: #64748b; border: none; background: none; width: 100%; font-size: 14px; font-weight: 500; transition: all 0.2s; }
   .eq-nav-item:hover { background: #f1f5f9; color: #0f172a; }
   .eq-nav-item.active { background: #eff6ff; color: #1d4ed8; }
+  .eq-nav-item.logout { color: #ef4444; }
+  .eq-nav-item.logout:hover { background: #fef2f2; color: #dc2626; }
   
   .eq-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-  .eq-header { background: white; border-bottom: 1px solid #e2e8f0; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; }
   .eq-header-mobile { display: none; padding: 16px; background: white; border-bottom: 1px solid #e2e8f0; align-items: center; justify-content: space-between; }
   
   .eq-content { padding: 32px; max-width: 1200px; margin: 0 auto; width: 100%; }
@@ -87,11 +127,24 @@ const styles = `
   
   .eq-badge { padding: 4px 8px; background: #ecfdf5; color: #047857; border-radius: 99px; font-size: 12px; font-weight: 600; }
   
+  /* Table Styles */
+  .eq-table-container { background: white; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; }
+  .eq-table { width: 100%; border-collapse: collapse; text-align: left; }
+  .eq-th { padding: 16px 24px; border-bottom: 1px solid #e2e8f0; font-weight: 600; color: #64748b; font-size: 13px; background: #f8fafc; text-transform: uppercase; letter-spacing: 0.05em; }
+  .eq-td { padding: 16px 24px; border-bottom: 1px solid #f1f5f9; color: #334155; font-size: 14px; }
+  .eq-tr:last-child .eq-td { border-bottom: none; }
+  .eq-tr:hover { background: #f8fafc; }
+  
+  .eq-status-gold { color: #b45309; background: #fffbeb; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid #fcd34d; }
+  .eq-status-silver { color: #52525b; background: #f4f4f5; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid #e4e4e7; }
+  .eq-status-bronze { color: #7c2d12; background: #ffedd5; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid #fed7aa; }
+
   @media (max-width: 1024px) {
     .eq-sidebar, .eq-header { display: none; }
     .eq-header-mobile { display: flex; }
     .eq-grid { grid-template-columns: 1fr; }
     .eq-content { padding: 16px; }
+    .eq-table { display: block; overflow-x: auto; }
   }
 `;
 
@@ -124,6 +177,141 @@ const ActionButton = ({ icon: Icon, title, description, onClick }) => (
   </button>
 );
 
+/* --- Views --- */
+
+const DashboardHome = ({ onNavigate }) => (
+  <>
+    <div className="eq-grid">
+      <StatCard 
+        title="Total Participation" 
+        value="52,450" 
+        icon={Icons.Users}
+        trend={12.5}
+      />
+      <StatCard 
+        title="Schools Registered" 
+        value="120" 
+        icon={Icons.Building} 
+        trend={4.2}
+      />
+      <StatCard 
+        title="Avg. Eco-Score" 
+        value="78%" 
+        icon={Icons.Leaf}
+        trend={1.8}
+      />
+    </div>
+
+    <h2 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '16px', color: '#1e293b' }}>
+      Quick Actions
+    </h2>
+    
+    <div className="eq-grid">
+      <ActionButton 
+        onClick={() => onNavigate('schools')}
+        icon={Icons.Chart}
+        title="School Performance"
+        description="View analytics for Doon, Woodstock, etc."
+      />
+      <ActionButton 
+        onClick={() => onNavigate('ngo')}
+        icon={Icons.Users}
+        title="NGO Collaboration"
+        description="Track partnerships with Green Yatra, etc."
+      />
+      <ActionButton 
+        onClick={() => onNavigate('policy')}
+        icon={Icons.FileText}
+        title="Generate Policy Report"
+        description="AI-assisted summary for review."
+      />
+    </div>
+  </>
+);
+
+const SchoolsView = () => (
+  <div className="eq-table-container">
+    <table className="eq-table">
+      <thead>
+        <tr>
+          <th className="eq-th">School Name</th>
+          <th className="eq-th">Region</th>
+          <th className="eq-th">Students</th>
+          <th className="eq-th">Eco-Score</th>
+          <th className="eq-th">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {SCHOOLS_DATA.map((school) => (
+          <tr key={school.id} className="eq-tr">
+            <td className="eq-td" style={{ fontWeight: 500 }}>{school.name}</td>
+            <td className="eq-td">{school.region}</td>
+            <td className="eq-td">{school.students.toLocaleString()}</td>
+            <td className="eq-td">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ width: '60px', height: '6px', background: '#e2e8f0', borderRadius: '4px', overflow: 'hidden' }}>
+                  <div style={{ width: `${school.ecoScore}%`, height: '100%', background: school.ecoScore > 90 ? '#059669' : '#3b82f6' }} />
+                </div>
+                {school.ecoScore}%
+              </div>
+            </td>
+            <td className="eq-td">
+              <span className={`eq-status-${school.status.toLowerCase()}`}>{school.status}</span>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+);
+
+const NGOView = () => (
+  <div className="eq-grid" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
+    {NGO_DATA.map((ngo) => (
+      <div key={ngo.id} className="eq-card" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+          <h3 style={{ fontSize: '18px', fontWeight: 600, margin: 0, color: '#0f172a' }}>{ngo.name}</h3>
+          <span className="eq-badge">{ngo.region}</span>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '8px' }}>
+          <div>
+            <p style={{ fontSize: '12px', color: '#64748b', margin: '0 0 4px 0' }}>Focus Area</p>
+            <p style={{ fontWeight: 500, margin: 0 }}>{ngo.focus}</p>
+          </div>
+          <div>
+            <p style={{ fontSize: '12px', color: '#64748b', margin: '0 0 4px 0' }}>Impact Rating</p>
+            <p style={{ fontWeight: 500, margin: 0, color: ngo.impact === 'Very High' ? '#059669' : '#334155' }}>{ngo.impact}</p>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
+const PolicyView = () => (
+  <div className="eq-card">
+    <h3 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '16px' }}>Generated Reports</h3>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+      {REPORTS_DATA.map((report) => (
+        <div key={report.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 0', borderBottom: '1px solid #f1f5f9' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div style={{ width: '40px', height: '40px', background: '#eff6ff', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3b82f6' }}>
+              <Icons.FileText />
+            </div>
+            <div>
+              <p style={{ margin: '0 0 4px 0', fontWeight: 500, color: '#0f172a' }}>{report.title}</p>
+              <p style={{ margin: 0, fontSize: '12px', color: '#94a3b8' }}>{report.type} • {report.size}</p>
+            </div>
+          </div>
+          <button style={{ padding: '8px', color: '#64748b', background: 'none', border: 'none', cursor: 'pointer' }}>
+            <Icons.Download />
+          </button>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
 const GovernmentDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -138,6 +326,41 @@ const GovernmentDashboard = () => {
     </button>
   );
 
+  const renderContent = () => {
+    switch(activeTab) {
+      case 'dashboard':
+        return <DashboardHome onNavigate={setActiveTab} />;
+      case 'schools':
+        return <SchoolsView />;
+      case 'ngo':
+        return <NGOView />;
+      case 'policy':
+        return <PolicyView />;
+      default:
+        return <DashboardHome onNavigate={setActiveTab} />;
+    }
+  };
+
+  const getTitle = () => {
+    switch(activeTab) {
+      case 'dashboard': return 'EcoQuest Government Dashboard';
+      case 'schools': return 'School Performance & Analytics';
+      case 'ngo': return 'NGO Partner Network';
+      case 'policy': return 'Policy & Impact Reports';
+      default: return 'Dashboard';
+    }
+  };
+
+  const getSubtitle = () => {
+    switch(activeTab) {
+      case 'dashboard': return 'View state-wide engagement metrics, completed challenges, and student progress.';
+      case 'schools': return 'Detailed breakdown of top performing schools, participation rates, and eco-scores across regions.';
+      case 'ngo': return 'Track collaboration impact, funding utilization, and regional focus areas of our partner organizations.';
+      case 'policy': return 'Download AI-generated summaries and impact assessments for legislative review.';
+      default: return '';
+    }
+  };
+
   return (
     <div className="eq-container">
       <style>{styles}</style>
@@ -150,11 +373,23 @@ const GovernmentDashboard = () => {
           </div>
           EcoQuest
         </div>
+        
         <div className="eq-nav">
           <NavItem id="dashboard" label="Dashboard" icon={Icons.Chart} />
           <NavItem id="schools" label="Schools" icon={Icons.Building} />
           <NavItem id="ngo" label="NGO Partners" icon={Icons.Users} />
           <NavItem id="policy" label="Policy Reports" icon={Icons.FileText} />
+        </div>
+
+        {/* Logout Section at bottom of sidebar */}
+        <div style={{ padding: '16px', borderTop: '1px solid #f1f5f9' }}>
+           <button 
+             className="eq-nav-item logout" 
+             onClick={() => console.log('Logout clicked')} // Add your logout logic here
+           >
+              <div style={{ width: 20 }}><Icons.LogOut /></div>
+              Logout
+           </button>
         </div>
       </aside>
 
@@ -174,66 +409,26 @@ const GovernmentDashboard = () => {
         </header>
 
         {isMobileMenuOpen && (
-          <div style={{ background: 'white', borderBottom: '1px solid #e2e8f0', padding: '16px' }}>
+          <div style={{ background: 'white', borderBottom: '1px solid #e2e8f0', padding: '16px', position: 'absolute', top: '60px', left: 0, right: 0, zIndex: 50, boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
              <NavItem id="dashboard" label="Dashboard" icon={Icons.Chart} />
              <NavItem id="schools" label="Schools" icon={Icons.Building} />
              <NavItem id="ngo" label="NGO Partners" icon={Icons.Users} />
+             <NavItem id="policy" label="Policy Reports" icon={Icons.FileText} />
+             <div style={{ height: '1px', background: '#f1f5f9', margin: '8px 0' }} />
+             <button className="eq-nav-item logout">
+               <div style={{ width: 20 }}><Icons.LogOut /></div>
+               Logout
+             </button>
           </div>
         )}
 
         <main className="eq-content">
           <div className="eq-title-section">
-            <h1 className="eq-title">EcoQuest Government Dashboard</h1>
-            <p className="eq-subtitle">
-              View state-wide engagement metrics, completed challenges, and student progress from the EcoQuest gamified platform.
-            </p>
+            <h1 className="eq-title">{getTitle()}</h1>
+            <p className="eq-subtitle">{getSubtitle()}</p>
           </div>
 
-          <div className="eq-grid">
-            <StatCard 
-              title="Total Participation" 
-              value="50,000" 
-              icon={Icons.Users}
-              trend={12.5}
-            />
-            <StatCard 
-              title="Schools Registered" 
-              value="120" 
-              icon={Icons.Building} 
-              trend={4.2}
-            />
-            <StatCard 
-              title="Avg. Eco-Score" 
-              value="78%" 
-              icon={Icons.Leaf}
-              trend={1.8}
-            />
-          </div>
-
-          <h2 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '16px', color: '#1e293b' }}>
-            Quick Actions
-          </h2>
-          
-          <div className="eq-grid">
-            <ActionButton 
-              onClick={() => setActiveTab('schools')}
-              icon={Icons.Chart}
-              title="School Performance"
-              description="Analytics on curriculum adoption."
-            />
-            <ActionButton 
-              onClick={() => setActiveTab('ngo')}
-              icon={Icons.Users}
-              title="NGO Collaboration"
-              description="Track partnership metrics."
-            />
-            <ActionButton 
-              onClick={() => setActiveTab('policy')}
-              icon={Icons.FileText}
-              title="Generate Policy Report"
-              description="AI-assisted summary for review."
-            />
-          </div>
+          {renderContent()}
         </main>
       </div>
     </div>
