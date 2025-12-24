@@ -12,7 +12,7 @@ const Features = () => {
     return (
         <section id="features" className="features-section">
             <div className="container">
-                <h2 className="section-title">Why EcoLearn?</h2>
+                <h2 className="section-title">Why EcoQuest?</h2>
                 <p className="section-subtitle">A platform built to merge education with practical conservation.</p>
                 <div className="features-grid">
                     {featuresData.map((feature, index) => (
